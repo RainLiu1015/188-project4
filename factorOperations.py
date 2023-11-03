@@ -102,7 +102,30 @@ def joinFactors(factors: List[Factor]):
 
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    domainDict = {}
+    conditioned = set() # input conditioned variables of returnFactor
+    unconditioned = set() # input unconditioned variables of returnFactor
+    for factor in factors:
+        domainDict = factor.variableDomainsDict()
+        unconditioned = unconditioned | factor.unconditionedVariables()
+        conditioned = (conditioned | factor.conditionedVariables()) - unconditioned
+        # if a factor is both conditioned and unconditioned, in the joined factor it will be unconditioned
+    maxAssignSize = len(list(conditioned)) + len(list(unconditioned)) # the maximum number of assignment
+    returnFactor = Factor(unconditioned, conditioned, domainDict)
+
+    for domain in returnFactor.getAllPossibleAssignmentDicts():
+        prob = 1.0
+        for factor in factors:
+            for subDomain in factor.getAllPossibleAssignmentDicts():
+                flag = 1
+                for key in subDomain.keys():
+                    if domain.get(key) != subDomain.get(key):
+                        flag = 0
+                if flag == 1:
+                    prob = prob * factor.getProbability(subDomain)
+        returnFactor.setProbability(domain, prob)
+
+    return returnFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
