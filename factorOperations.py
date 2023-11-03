@@ -113,7 +113,7 @@ def joinFactors(factors: List[Factor]):
     maxAssignSize = len(list(conditioned)) + len(list(unconditioned)) # the maximum number of assignment
     returnFactor = Factor(unconditioned, conditioned, domainDict)
 
-    for domain in returnFactor.getAllPossibleAssignmentDicts():
+    for domain in returnFactor.getAllPossibleAssignmentDicts(): # ensure that every assignment gets the right value
         prob = 1.0
         for factor in factors:
             for subDomain in factor.getAllPossibleAssignmentDicts():
@@ -176,7 +176,25 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        unconditioned = factor.unconditionedVariables()
+        conditioned = factor.conditionedVariables()
+        domain = factor.variableDomainsDict()
+        unconditioned = unconditioned - {eliminationVariable}
+        conditioned = conditioned - {eliminationVariable}
+
+        returnFactor = Factor(unconditioned, conditioned, domain)
+
+        # calculate the returnFactor
+        for assignment in returnFactor.getAllPossibleAssignmentDicts():
+            for subAssignment in factor.getAllPossibleAssignmentDicts():
+                flag = 1
+                for key in assignment.keys():
+                    if subAssignment[key] != assignment[key]:
+                        flag = 0
+                if flag == 1: # reset the probability
+                    returnFactor.setProbability(assignment, returnFactor.getProbability(assignment) + factor.getProbability(subAssignment))
+
+        return returnFactor
         "*** END YOUR CODE HERE ***"
 
     return eliminate
