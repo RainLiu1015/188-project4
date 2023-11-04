@@ -619,12 +619,14 @@ class ExactInference(InferenceModule):
         for position in self.allPositions:
             transition[position] = self.getPositionDistribution(gameState, position)
 
+        # compute B(Wi+1) form B(Wi)
+        # B(Wi+1) is proportional to P(fi+1|Wi+1) * summation_of_wi((Wi+1|wi) * B(wi))
         for position in self.allPositions:
             sumProb = 0.0
             for oldPos in self.allPositions:
                 if transition[oldPos].__contains__(position):
                     sumProb += transition[oldPos][position] * self.beliefs[oldPos]
-            updateBeliefs[position] = sumProb
+            updateBeliefs[position] = sumProb * self.getObservationProb()
 
         # it doesn't change the original beliefs if we only edit the self.beliefs -> why?
         self.beliefs = updateBeliefs
