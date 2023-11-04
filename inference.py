@@ -626,8 +626,7 @@ class ExactInference(InferenceModule):
             for oldPos in self.allPositions:
                 if transition[oldPos].__contains__(position):
                     sumProb += transition[oldPos][position] * self.beliefs[oldPos]
-            updateBeliefs[position] = sumProb * self.getObservationProb()
-
+            updateBeliefs[position] = sumProb
         # it doesn't change the original beliefs if we only edit the self.beliefs -> why?
         self.beliefs = updateBeliefs
         "*** END YOUR CODE HERE ***"
