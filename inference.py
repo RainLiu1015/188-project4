@@ -714,7 +714,22 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        print(self.beliefs)
+        pacPos = gameState.getPacmanPosition()
+        jailPos = self.getJailPosition()
+        beliefs = self.getBeliefDistribution()
+        particles = self.particles
+
+        for particle in beliefs.keys():
+            beliefs[particle] *= self.getObservationProb(observation, pacPos, particle, jailPos)
+
+        if beliefs.total() == 0:
+            self.initializeUniformly(gameState)
+            return
+
+        newParticles = list()
+        for i in range(self.numParticles):
+            newParticles.append(beliefs.sample())
+        self.particles = newParticles
         "*** END YOUR CODE HERE ***"
     ########### ########### ###########
     ########### QUESTION 11 ###########
