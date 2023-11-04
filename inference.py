@@ -667,8 +667,12 @@ class ParticleFilter(InferenceModule):
         for i in range(numPos - 1):
             for j in range(n):
                 self.particles.append(self.legalPositions[i])
-        for i in range(numMod):
-            self.particles.append(self.legalPositions[numPos - 1])
+        if numMod == 0:
+            for i in range(n):
+                self.particles.append(self.legalPositions[numPos - 1])
+        else :
+            for i in range(numMod):
+                self.particles.append(self.legalPositions[numPos - 1])
         "*** END YOUR CODE HERE ***"
 
     def getBeliefDistribution(self):
@@ -681,10 +685,15 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         distribution = DiscreteDistribution()
-        belief = 1 / len(self.legalPositions)
-        # since the particles are evenly distributed, the belief of each position should be the same
+        count = DiscreteDistribution()
         for particle in self.particles:
-            distribution[particle] = belief
+            count[particle] += 1
+
+        total = count.total()
+        for particle in self.particles:
+            distribution[particle] = count[particle] / total
+
+        distribution.normalize()
         return distribution
         "*** END YOUR CODE HERE ***"
     
@@ -705,9 +714,8 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        print(self.beliefs)
         "*** END YOUR CODE HERE ***"
-    
     ########### ########### ###########
     ########### QUESTION 11 ###########
     ########### ########### ###########
