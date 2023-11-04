@@ -588,6 +588,10 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
+        # self.belief before update: B'(Wi) = P(Wi | |f1, f2, ..., fi-1)
+        # then we get the observation from the sensors, which is fi
+        # self.belief after update : B(Wi) = P(Wi | |f1, f2, ..., fi)
+        # B(Wi) is proportional of P(fi | Wi) * B'(Wi)
         jailPos = self.getJailPosition()
         pacPos = gameState.getPacmanPosition()
         for ghostPos in self.allPositions:
@@ -609,7 +613,21 @@ class ExactInference(InferenceModule):
         current position is known.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        transition = {}
+        updateBeliefs = DiscreteDistribution()
+        # transition is a dictionary mapping oldPos -> dict{newPos: probability}
+        for position in self.allPositions:
+            transition[position] = self.getPositionDistribution(gameState, position)
+
+        for position in self.allPositions:
+            sumProb = 0.0
+            for oldPos in self.allPositions:
+                if transition[oldPos].__contains__(position):
+                    sumProb += transition[oldPos][position] * self.beliefs[oldPos]
+            updateBeliefs[position] = sumProb
+
+        # it doesn't change the original beliefs if we only edit the self.beliefs -> why?
+        self.beliefs = updateBeliefs
         "*** END YOUR CODE HERE ***"
 
     def getBeliefDistribution(self):
